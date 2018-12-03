@@ -696,7 +696,7 @@ func SpaceCollideShapes(a, b *Shape, space *Space) {
 	}
 
 	if preSolveResult &&
-		// Process, but don't add collisions for sensors.
+	// Process, but don't add collisions for sensors.
 		!sensor {
 		space.Arbiters = append(space.Arbiters, arb)
 	} else {
@@ -784,18 +784,28 @@ func RayAgainstCircle(cast *RayCast, circle *CircleShape, outT *float32) bool {
 	t1 := (-b - D) / (2.0 * a)
 	t2 := (-b + D) / (2.0 * a)
 
-	if (t1 >= 0.0 && t1 <= 1.0) || (t2 >= 0.0 && t2 <= 1.0) {
-		if t1 > t2 && t2 >= 0.0 {
+	//not belongs to our ray
+	if (t1 < 0.0 && t2 < 0.0) || (t1 > 1.0 && t2 > 1.0) {
+		return false
+	}
+
+	if t1 < t2 {
+		if t1 >= 0.0 {
+			*outT = t1
+		} else {
 			*outT = t2
-		} else if t1 >= 0.0 {
+		}
+	} else {
+		if t2 >= 0.0 {
+			*outT = t2
+		} else {
 			*outT = t1
 		}
-		return true
 	}
-	return false
+	return true
 }
 
-func (space *Space) RayCastAll(begin vect.Vect, direction vect.Vect)[]*RayCastHit {
+func (space *Space) RayCastAll(begin vect.Vect, direction vect.Vect) []*RayCastHit {
 	hits := []*RayCastHit{}
 
 	rayCast := &RayCast{
